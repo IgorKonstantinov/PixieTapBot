@@ -162,6 +162,28 @@ class Tapper:
             logger.error(f"{self.session_name} | Unknown error when get improvements data: {error}")
             await asyncio.sleep(delay=30)
 
+    async def referrals(self, http_client: aiohttp.ClientSession, action=''):
+        try:
+            match action:
+                case 'get':
+                    referrals_url = f"https://api-v1-production.pixie-game.com/api/clicker/referrals/get/{self.user_id}"
+                    response = await http_client.get(url=referrals_url)
+                case 'post':
+                    raw_data = {'timestamp': int(time())}
+                    referrals_url = "https://api-v1-production.pixie-game.com/api/v3/referrals/get/coins"
+                    response = await http_client.post(url=referrals_url, json=raw_data)
+                case _:
+                    raise ValueError("There is no passive_action.")
+
+            response.raise_for_status()
+
+            response_json = await response.json()
+            return response_json
+
+        except Exception as error:
+            logger.error(f"{self.session_name} | Unknown error when get improvements data: {error}")
+            await asyncio.sleep(delay=30)
+
 
     async def run(self, proxy: str | None) -> None:
         proxy_conn = ProxyConnector().from_url(proxy) if proxy else None
