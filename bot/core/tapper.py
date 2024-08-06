@@ -159,7 +159,7 @@ class Tapper:
             return response_json
 
         except Exception as error:
-            logger.error(f"{self.session_name} | Unknown error when get minings data: {error}")
+            logger.error(f"{self.session_name} | Unknown error when get improvements data: {error}")
             await asyncio.sleep(delay=30)
 
 
@@ -230,25 +230,26 @@ class Tapper:
 
                         if card_id in levels:
                             level = levels[card_id]
+                            name = card['name_en']
                             price = card['price']
                             coef = card['price_coef']
                             calculated_price = calculate_price(price, coef, level)
 
                             if calculated_price <= auth_data_balance:
-                                print(card_id, level, calculated_price)
-                                heapq.heappush(queue, (calculated_price, card_id, level))
+                                print(name, card_id, level, calculated_price)
+                                heapq.heappush(queue, (calculated_price, card_id, level, name))
 
                     if len(queue) > 0:
 
                         card_upgrade = heapq.nsmallest(1, queue)[0]
                         print(card_upgrade)
 
+                        card_upgrade_price = card_upgrade[0]
                         card_upgrade_id = card_upgrade[1]
                         card_upgrade_level = int(card_upgrade[2])
+                        card_upgrade_name = card_upgrade[3]
 
-                        print(card_upgrade_id, card_upgrade_level)
-
-                        logger.info(f"{self.session_name} | Sleep {random_sleep:,}s before upgrade card: <e>[{card_upgrade_id}]</e> to level: <e>[{card_upgrade_level}]</e>")
+                        logger.info(f"{self.session_name} | Sleep {random_sleep:,}s before upgrade card: <e>[{card_upgrade_id}/{card_upgrade_name}]</e> to level: <e>[{card_upgrade_level}]</e> with price: <e>[{card_upgrade_price}]</e>")
                         await asyncio.sleep(delay=random_sleep)
 
                         improvements_action = 'set'
@@ -273,7 +274,6 @@ class Tapper:
                         await asyncio.sleep(delay=random_sleep)
                     else:
                         logger.info(f"{self.session_name} | Cannot [tap]")
-
 
                 logger.info(f"{self.session_name} | Sleep {long_sleep:,}s")
                 await asyncio.sleep(delay=long_sleep)

@@ -7,7 +7,7 @@ class Settings(BaseSettings):
     API_HASH: str
 
     SLEEP_RANDOM: list[int] = [3, 5]
-    SLEEP_BETWEEN_MINING: list[int] = [600, 900]
+    SLEEP_BETWEEN_MINING: list[int] = [300, 900]
 
     AUTO_UPGRADE: bool = True
     MAX_LEVEL: int = 20
