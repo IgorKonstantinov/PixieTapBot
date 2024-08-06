@@ -1,0 +1,13 @@
+version: '3'
+services:
+  pixietapbot:
+    container_name: 'PixieTapBot'
+    build:
+      context: .
+    stop_signal: SIGINT
+    restart: unless-stopped
+    command: "python3 main.py -a 1"
+    environment:
+    - TZ=Europe/Chisinau
+    volumes:
+      - .:/app
