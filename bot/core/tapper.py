@@ -286,16 +286,22 @@ class Tapper:
                     else:
                         logger.info(f"{self.session_name} | Cannot [improvements], balance is too small: <g>{auth_data_balance}</g>")
 
-                taps = auth_data_current_energy
-                if taps > 0:
-                    logger.info(f"{self.session_name} | Sleep {random_sleep:,}s before bot action: <e>[tap]</e>: <e>{taps}</e>")
-                    await asyncio.sleep(delay=random_sleep)
+                logger.info(f"{self.session_name} | sleep {random_sleep:,}s before bot action: <e>[tap]</e>")
+                await asyncio.sleep(delay=random_sleep)
+
+                while auth_data_current_energy > 100:
+                    taps = random.randint(*settings.TAP_RANDOM)
+
+                    if taps*auth_data_coins_per_click >= auth_data_current_energy:
+                        taps = abs(auth_data_current_energy // auth_data_coins_per_click -1)
+
                     taps_data = await self.tap(http_client=http_client, taps=taps)
                     if taps_data:
-                        logger.success(f"{self.session_name} | Bot action: <red>[tap]</red> : <c>{taps_data}</c>")
+                        logger.success(f"{self.session_name} | Bot action: <red>[tap/{taps}/{taps*auth_data_coins_per_click}]</red> : <c>{taps_data}</c>")
+                        auth_data_current_energy = taps_data['current_energy']
                         await asyncio.sleep(delay=random_sleep)
                     else:
-                        logger.info(f"{self.session_name} | Cannot [tap]")
+                        logger.error(f"{self.session_name} | Bot action:[tap] error")
 
                 logger.info(f"{self.session_name} | Sleep {long_sleep:,}s")
                 await asyncio.sleep(delay=long_sleep)
