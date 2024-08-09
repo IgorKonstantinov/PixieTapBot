@@ -317,7 +317,7 @@ class Tapper:
                         await asyncio.sleep(delay=random_sleep)
 
                     else:
-                        logger.info(f"{self.session_name} | Cannot [refarrals/{referrals_action}]")
+                        logger.info(f"{self.session_name} | Cannot [refarrals/{referrals_action}]: no referrals")
 
                 logger.info(f"{self.session_name} | sleep {random_sleep:,}s before bot action: <e>[tap]</e>")
                 await asyncio.sleep(delay=random_sleep)
