@@ -274,7 +274,7 @@ class Tapper:
                                 print(name, card_id, level, calculated_price)
                                 heapq.heappush(queue, (calculated_price, card_id, level, name))
 
-                    if len(queue) > 0:
+                    if len(queue) > 1:
                         card_upgrade = heapq.nsmallest(1, queue)[0]
                         print(card_upgrade)
 
@@ -306,7 +306,8 @@ class Tapper:
 
                     referrals_action = 'get'
                     referrals_data = await self.referrals(http_client=http_client, action=referrals_action)
-                    if referrals_data:
+
+                    if len(referrals_data) > 1:
                         logger.success(f"{self.session_name} | Bot action: <red>[refarrals/{referrals_action}]</red>")
                         await asyncio.sleep(delay=random_sleep)
 
