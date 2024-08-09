@@ -307,7 +307,7 @@ class Tapper:
                     referrals_action = 'get'
                     referrals_data = await self.referrals(http_client=http_client, action=referrals_action)
 
-                    if len(referrals_data) > 1:
+                    if len(referrals_data) > 0:
                         logger.success(f"{self.session_name} | Bot action: <red>[refarrals/{referrals_action}]</red>")
                         await asyncio.sleep(delay=random_sleep)
 
