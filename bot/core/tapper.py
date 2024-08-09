@@ -188,6 +188,7 @@ class Tapper:
     async def run(self, proxy: str | None) -> None:
         proxy_conn = ProxyConnector().from_url(proxy) if proxy else None
         http_client = CloudflareScraper(headers=headers, connector=proxy_conn)
+        referrals_created_time = 0
 
         if proxy:
             await self.check_proxy(http_client=http_client, proxy=proxy)
@@ -208,10 +209,11 @@ class Tapper:
 
                 tg_web_data = await self.get_tg_web_data(proxy=proxy)
                 auth_data = await self.auth(http_client=http_client)
-                print(auth_data)
+
                 logger.info(f"Generate new access_token: {auth_data['token']}")
                 http_client.headers["auth-api-token"] = auth_data['token']
 
+                #auth_data_level = int(float(auth_data['user']['level']))
                 auth_data_total_earn = int(float(auth_data['user']['total_earn']))
                 auth_data_balance = int(float(auth_data['user']['balance']))
                 auth_data_old_balance = int(float(auth_data['user']['old_balance']))
@@ -295,6 +297,26 @@ class Tapper:
 
                     else:
                         logger.info(f"{self.session_name} | Cannot [improvements], balance is too small: <g>{auth_data_balance}</g>")
+
+                if settings.AUTO_REFERRALS and (time() - referrals_created_time >= 3600):
+
+                    referrals_created_time = time()
+                    logger.info(f"{self.session_name} | Sleep {random_sleep:,}s before refarrals claim")
+                    await asyncio.sleep(delay=random_sleep)
+
+                    referrals_action = 'get'
+                    referrals_data = await self.referrals(http_client=http_client, action=referrals_action)
+                    if referrals_data:
+                        logger.success(f"{self.session_name} | Bot action: <red>[refarrals/{referrals_action}]</red>")
+                        await asyncio.sleep(delay=random_sleep)
+
+                        referrals_action = 'post'
+                        referrals_data = await self.referrals(http_client=http_client, action=referrals_action)
+                        logger.success(f"{self.session_name} | Bot action: <red>[refarrals/{referrals_action}]:</red> {referrals_data}")
+                        await asyncio.sleep(delay=random_sleep)
+
+                    else:
+                        logger.info(f"{self.session_name} | Cannot [refarrals/{referrals_action}]")
 
                 logger.info(f"{self.session_name} | sleep {random_sleep:,}s before bot action: <e>[tap]</e>")
                 await asyncio.sleep(delay=random_sleep)

@@ -15,6 +15,8 @@ class Settings(BaseSettings):
     MAX_LEVEL: int = 20
     BALANCE_TO_SAVE: int = 100000
 
+    AUTO_REFERRALS: bool = True
+
     APPLY_DAILY_BOOST: bool = False
     USE_PROXY_FROM_FILE: bool = False
 
