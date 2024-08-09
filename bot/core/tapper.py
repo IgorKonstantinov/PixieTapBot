@@ -208,6 +208,7 @@ class Tapper:
 
                 tg_web_data = await self.get_tg_web_data(proxy=proxy)
                 auth_data = await self.auth(http_client=http_client)
+                print(auth_data)
                 logger.info(f"Generate new access_token: {auth_data['token']}")
                 http_client.headers["auth-api-token"] = auth_data['token']
 
@@ -260,9 +261,18 @@ class Tapper:
                             if calculated_price <= auth_data_balance:
                                 print(name, card_id, level, calculated_price)
                                 heapq.heappush(queue, (calculated_price, card_id, level, name))
+                        else:
+                            level = 1
+                            name = card['name_en']
+                            price = card['price']
+                            coef = card['price_coef']
+                            calculated_price = calculate_price(price, coef, level)
+
+                            if calculated_price <= auth_data_balance:
+                                print(name, card_id, level, calculated_price)
+                                heapq.heappush(queue, (calculated_price, card_id, level, name))
 
                     if len(queue) > 0:
-
                         card_upgrade = heapq.nsmallest(1, queue)[0]
                         print(card_upgrade)
 
