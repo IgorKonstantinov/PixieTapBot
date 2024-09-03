@@ -65,7 +65,7 @@ class Tapper:
 
             while True:
                 try:
-                    peer = await self.tg_client.resolve_peer('Simple_Tap_Bot')
+                    peer = await self.tg_client.resolve_peer('pixie_project_bot')
                     break
                 except FloodWait as fl:
                     fls = fl.value
@@ -80,7 +80,7 @@ class Tapper:
                 bot=peer,
                 platform='android',
                 from_bot_menu=False,
-                url='https://simpletap.app'
+                url='https://pixie-game.com'
             ))
 
             auth_url = web_view.url
@@ -186,28 +186,18 @@ class Tapper:
 
 
     async def run(self, proxy: str | None) -> None:
-        proxy_conn = ProxyConnector().from_url(proxy) if proxy else None
-        http_client = CloudflareScraper(headers=headers, connector=proxy_conn)
         referrals_created_time = 0
 
-        if proxy:
-            await self.check_proxy(http_client=http_client, proxy=proxy)
-
-        tg_web_data = await self.get_tg_web_data(proxy=proxy)
-
         while True:
+            error_sleep = random.randint(*settings.SLEEP_BETWEEN_MINING)
             try:
                 #Randomize variables
                 random_sleep = random.randint(*settings.SLEEP_RANDOM)
                 long_sleep = random.randint(*settings.SLEEP_BETWEEN_MINING)
 
-                if not tg_web_data:
-                    continue
-
-                if http_client.closed:
-                    http_client = CloudflareScraper(headers=headers)
-
+                http_client = CloudflareScraper(headers=headers)
                 tg_web_data = await self.get_tg_web_data(proxy=proxy)
+
                 auth_data = await self.auth(http_client=http_client)
 
                 logger.info(f"Generate new access_token: {auth_data['token']}")
@@ -337,16 +327,17 @@ class Tapper:
                         logger.error(f"{self.session_name} | Bot action:[tap] error")
 
                 logger.info(f"{self.session_name} | Sleep {long_sleep:,}s")
-                await asyncio.sleep(delay=long_sleep)
                 await http_client.close()
+                await asyncio.sleep(delay=long_sleep)
 
             except InvalidSession as error:
                 raise error
 
             except Exception as error:
                 logger.error(f"{self.session_name} | Unknown error: {error}")
-                await asyncio.sleep(delay=30)
                 await http_client.close()
+                await asyncio.sleep(delay=error_sleep)
+
 
 async def run_tapper(tg_client: Client, proxy: str | None):
     try:
